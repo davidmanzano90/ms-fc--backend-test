@@ -2,7 +2,7 @@ package com.scmspain.services;
 
 import com.scmspain.entities.Tweet;
 import com.scmspain.repositories.TweetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.scmspain.validators.TweetValidator;
 import org.springframework.boot.actuate.metrics.writer.Delta;
 import org.springframework.boot.actuate.metrics.writer.MetricWriter;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,15 @@ import java.util.NoSuchElementException;
 @Transactional
 public class TweetService {
 
-    @Autowired
     private TweetRepository tweetRepository;
-    @Autowired
+    private TweetValidator tweetValidator;
     private MetricWriter metricWriter;
+
+    public TweetService(TweetRepository tweetRepository, TweetValidator tweetValidator, MetricWriter metricWriter) {
+        this.tweetRepository = tweetRepository;
+        this.tweetValidator = tweetValidator;
+        this.metricWriter = metricWriter;
+    }
 
     /**
      * Push tweet to repository
@@ -28,17 +33,14 @@ public class TweetService {
      * Result - recovered Tweet
      */
     public void publishTweet(String publisher, String text) {
-        if (publisher != null && publisher.length() > 0 && text != null && text.length() > 0 && text.length() < 140) {
-            Tweet tweet = new Tweet();
-            tweet.setTweet(text);
-            tweet.setPublisher(publisher);
-            tweet.setPublicationDate(new Date());
+        Tweet tweet = new Tweet();
+        tweet.setTweet(text);
+        tweet.setPublisher(publisher);
+        tweet.setPublicationDate(new Date());
+        tweetValidator.validate(tweet);
 
-            tweetRepository.save(tweet);
-            metricWriter.increment(new Delta<Number>("published-tweets", 1));
-        } else {
-            throw new IllegalArgumentException("Tweet must not be greater than 140 characters");
-        }
+        tweetRepository.save(tweet);
+        metricWriter.increment(new Delta<Number>("published-tweets", 1));
     }
 
     /**

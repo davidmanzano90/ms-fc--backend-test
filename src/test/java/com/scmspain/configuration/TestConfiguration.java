@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 @Configuration
 @Import({MsFcTechTestApplication.class})
-public class InfrastructureConfigurationTest {
+public class TestConfiguration {
     @Bean
     public MBeanExporter mockExporter() {
         return mock(MBeanExporter.class);

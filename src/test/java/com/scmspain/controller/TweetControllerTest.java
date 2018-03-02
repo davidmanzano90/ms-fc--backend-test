@@ -1,10 +1,12 @@
 package com.scmspain.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scmspain.configuration.TestConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestConfiguration.class)
 public class TweetControllerTest {
+
     @Autowired
     private WebApplicationContext context;
     private MockMvc mockMvc;
@@ -31,6 +35,7 @@ public class TweetControllerTest {
     public void setUp() {
         this.mockMvc = webAppContextSetup(this.context).build();
     }
+
 
     @Test
     public void shouldReturn200WhenInsertingAValidTweet() throws Exception {

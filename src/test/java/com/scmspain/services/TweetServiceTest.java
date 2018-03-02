@@ -2,22 +2,30 @@ package com.scmspain.services;
 
 import com.scmspain.entities.Tweet;
 import com.scmspain.repositories.TweetRepository;
+import com.scmspain.validators.TweetValidator;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.writer.MetricWriter;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class TweetServiceTest {
 
-    @Autowired
-    private TweetService tweetService;
-    @Mock
     private TweetRepository tweetRepository;
-    @Mock
+    private TweetValidator tweetValidator;
     private MetricWriter metricWriter;
+    private TweetService tweetService;
+
+    @Before
+    public void setUp() {
+        this.tweetRepository = mock(TweetRepository.class);
+        this.tweetValidator = mock(TweetValidator.class);
+        this.metricWriter = mock(MetricWriter.class);
+
+        this.tweetService = new TweetService(tweetRepository, tweetValidator, metricWriter);
+    }
 
     @Test
     public void shouldInsertANewTweet() throws Exception {
