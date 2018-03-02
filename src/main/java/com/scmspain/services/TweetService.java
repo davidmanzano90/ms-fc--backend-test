@@ -1,85 +1,47 @@
 package com.scmspain.services;
 
 import com.scmspain.entities.Tweet;
-import com.scmspain.repositories.TweetRepository;
-import com.scmspain.validators.TweetValidator;
-import org.springframework.boot.actuate.metrics.writer.Delta;
-import org.springframework.boot.actuate.metrics.writer.MetricWriter;
-import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-@Service
-@Transactional
-public class TweetService {
 
-    private TweetRepository tweetRepository;
-    private TweetValidator tweetValidator;
-    private MetricWriter metricWriter;
-
-    public TweetService(TweetRepository tweetRepository, TweetValidator tweetValidator, MetricWriter metricWriter) {
-        this.tweetRepository = tweetRepository;
-        this.tweetValidator = tweetValidator;
-        this.metricWriter = metricWriter;
-    }
+public interface TweetService {
 
     /**
      * Push tweet to repository
-     * Parameter - publisher - creator of the Tweet
-     * Parameter - text - Content of the Tweet
-     * Result - recovered Tweet
+     *
+     * @param publisher - Creator of the Tweet
+     * @param text      - Content of the Tweet
      */
-    public void publishTweet(String publisher, String text) {
-        Tweet tweet = new Tweet();
-        tweet.setTweet(text);
-        tweet.setPublisher(publisher);
-        tweet.setPublicationDate(new Date());
-        tweetValidator.validate(tweet);
-
-        tweetRepository.save(tweet);
-        metricWriter.increment(new Delta<Number>("published-tweets", 1));
-    }
+    void publishTweet(String publisher, String text);
 
     /**
      * Recover tweet from repository
-     * Parameter - id - id of the Tweet to retrieve
-     * Result - retrieved Tweet
+     *
+     * @param id - Id of the Tweet to retrieve
+     * @return Tweet - Retrieved Tweet
      */
-    public Tweet getTweet(Long id) {
-        return tweetRepository.findOne(id);
-    }
-
-    public void discardTweet(Long id) throws NoSuchElementException {
-        Tweet tweet = tweetRepository.findOne(id);
-        if (tweet != null) {
-            tweet.setDiscarded(Boolean.TRUE);
-            tweet.setDiscardedDate(new Date());
-
-            tweetRepository.save(tweet);
-            metricWriter.increment(new Delta<Number>("published-tweets", -1));
-        } else {
-            throw new NoSuchElementException("There is not any tweet with id " + id);
-        }
-    }
+    Tweet getTweet(Long id);
 
     /**
-     * Recover tweet from repository
-     * Parameter - id - id of the Tweet to retrieve
-     * Result - retrieved Tweet
+     * Mark as discarded the tweet with the specified id, if the tweet is not found it throws an exception
+     *
+     * @param id - The id of the tweet
      */
-    public List<Tweet> listAllTweets() {
-        List<Tweet> tweets = tweetRepository.findAllByDiscardedFalseOrderByPublicationDateDesc();
-        metricWriter.increment(new Delta<Number>("times-queried-tweets", 1));
-        return tweets;
-    }
+    void discardTweet(Long id);
 
+    /**
+     * Retrieve a list of tweets that has not been discarded, sorted in descending order on the day of publication
+     *
+     * @return List<Tweet> - No discarded tweets
+     */
+    List<Tweet> listAllTweets();
 
-    public List<Tweet> listAllDiscardedTweets() {
-        List<Tweet> discardedTweets = tweetRepository.findAllByDiscardedTrueOrderByDiscardedDateDesc();
-        metricWriter.increment(new Delta<Number>("times-queried-discarded-tweets", 1));
-        return discardedTweets;
-    }
+    /**
+     * Retrieve a list of discarded tweets sorted in descending order on the day they were discarded
+     *
+     * @return List<Tweet> - Discarded tweets
+     */
+    List<Tweet> listAllDiscardedTweets();
+
 }

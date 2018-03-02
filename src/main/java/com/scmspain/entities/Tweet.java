@@ -30,6 +30,11 @@ public class Tweet {
     public Tweet() {
     }
 
+    public Tweet(String publisher, String tweet) {
+        this.publisher = publisher;
+        this.tweet = tweet;
+    }
+
     public Long getId() {
         return id;
     }

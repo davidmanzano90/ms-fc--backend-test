@@ -16,11 +16,45 @@ public class MatcherUtilsTest {
     }
 
     @Test
-    public void shouldMatchTheLinkWhenHasBeginningText() {
+    public void shouldReturnsAnEmptyArrayWhenTextIsNull() {
+        List<String> links = matcherUtils.matchLinks(null);
+        Assert.assertEquals(links.size(), 0);
+    }
+
+    @Test
+    public void shouldReturnsAnEmptyArrayWhenTextIsEmpty() {
+        List<String> links = matcherUtils.matchLinks("");
+        Assert.assertEquals(links.size(), 0);
+    }
+
+    @Test
+    public void shouldNotMatchTheLinkWhenOnlyHasHttpProtocol() {
+        String text = "Hey http:// ";
+        List<String> links = matcherUtils.matchLinks(text);
+        Assert.assertEquals(links.size(), 0);
+    }
+
+    @Test
+    public void shouldNotMatchTheLinkWhenOnlyHasHttpsProtocol() {
+        String text = "Hey https:// ";
+        List<String> links = matcherUtils.matchLinks(text);
+        Assert.assertEquals(links.size(), 0);
+    }
+
+    @Test
+    public void shouldMatchTheLinkWhenIsHttp() {
         String text = "Hey http://foogle.co ";
         List<String> links = matcherUtils.matchLinks(text);
         Assert.assertEquals(links.size(), 1);
         Assert.assertEquals(links.get(0), "http://foogle.co ");
+    }
+
+    @Test
+    public void shouldMatchTheLinkWhenIsHttps() {
+        String text = "Hey https://foogle.co ";
+        List<String> links = matcherUtils.matchLinks(text);
+        Assert.assertEquals(links.size(), 1);
+        Assert.assertEquals(links.get(0), "https://foogle.co ");
     }
 
     @Test
@@ -56,6 +90,5 @@ public class MatcherUtilsTest {
         Assert.assertEquals(links.get(0), "http://foogle.co ");
         Assert.assertEquals(links.get(1), "http://foogle.es ");
     }
-
 
 }

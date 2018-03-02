@@ -3,6 +3,7 @@ package com.scmspain.configuration;
 import com.scmspain.controller.TweetController;
 import com.scmspain.repositories.TweetRepository;
 import com.scmspain.services.TweetService;
+import com.scmspain.services.TweetServiceImpl;
 import com.scmspain.utils.MatcherUtils;
 import com.scmspain.validators.TweetValidator;
 import org.springframework.boot.actuate.metrics.writer.MetricWriter;
@@ -15,12 +16,12 @@ public class TweetConfiguration {
     @Bean
     public TweetService getTweetService(TweetRepository tweetRepository, TweetValidator tweetValidator,
                                         MetricWriter metricWriter) {
-        return new TweetService(tweetRepository, tweetValidator, metricWriter);
+        return new TweetServiceImpl(tweetRepository, tweetValidator, metricWriter);
     }
 
     @Bean
-    public TweetController getTweetController(TweetService tweetService) {
-        return new TweetController(tweetService);
+    public TweetController getTweetController(TweetServiceImpl tweetServiceImpl) {
+        return new TweetController(tweetServiceImpl);
     }
 
     @Bean

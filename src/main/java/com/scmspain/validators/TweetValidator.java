@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class TweetValidator {
@@ -29,23 +30,22 @@ public class TweetValidator {
      * @param tweet - The tweet to validate
      */
     public void validate(Tweet tweet) {
-        LOGGER.debug("Validating tweet {}", tweet);
-        if (StringUtils.isEmpty(tweet.getPublisher())) {
+        if (StringUtils.isEmpty(StringUtils.trimAllWhitespace(tweet.getPublisher()))) {
             throw new IllegalArgumentException("Tweet must have a publisher");
         }
-        if (StringUtils.isEmpty(tweet.getTweet())) {
+        if (StringUtils.isEmpty(StringUtils.trimAllWhitespace(tweet.getTweet()))) {
             throw new IllegalArgumentException("Tweet must not be empty or null");
-        } else if (tweet.getTweet().length() - countListCharacters(matcherUtils.matchLinks(tweet.getTweet()))
+        } else if (tweet.getTweet().length() - countListCharacters(this.matcherUtils.matchLinks(tweet.getTweet()))
                 > TWEET_MAX_CHARACTERS) {
             throw new IllegalArgumentException("Tweet must not be greater than 140 characters");
         }
     }
 
     private int countListCharacters(List<String> list) {
-        int count = 0;
-        for (String str : list) {
-            count += str.length();
-        }
-        return count;
+        AtomicInteger counter = new AtomicInteger(0);
+        list.forEach((str) -> {
+            counter.addAndGet(str.length());
+        });
+        return counter.get();
     }
 }

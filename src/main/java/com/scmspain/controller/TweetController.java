@@ -22,44 +22,45 @@ public class TweetController {
 
     @GetMapping("/tweet")
     public List<Tweet> listAllTweets() {
-        return tweetService.listAllTweets();
+        return this.tweetService.listAllTweets();
     }
 
     @PostMapping("/tweet")
     @ResponseStatus(CREATED)
     public void publishTweet(@RequestBody PublishTweetCommand publishTweetCommand) {
-        tweetService.publishTweet(publishTweetCommand.getPublisher(), publishTweetCommand.getTweet());
+        this.tweetService.publishTweet(publishTweetCommand.getPublisher(), publishTweetCommand.getTweet());
     }
 
     @GetMapping("/discarded")
     public List<Tweet> listAllDiscarded() {
-        return tweetService.listAllDiscardedTweets();
+        return this.tweetService.listAllDiscardedTweets();
     }
 
     @PostMapping("/discarded")
     @ResponseStatus(OK)
     public void discardTweet(@RequestBody DiscardTweetCommand discardTweetCommand) {
-        tweetService.discardTweet(discardTweetCommand.getTweet());
+        this.tweetService.discardTweet(discardTweetCommand.getTweet());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
     public Object invalidArgumentException(IllegalArgumentException ex) {
-        return getExceptionDetails(ex);
+        return handleException(ex);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(NOT_FOUND)
     @ResponseBody
     public Object invalidArgumentException(NoSuchElementException ex) {
-        return getExceptionDetails(ex);
+        return handleException(ex);
     }
 
-    private Object getExceptionDetails(Exception ex) {
+    private Object handleException(Exception ex) {
         return new Object() {
             public String message = ex.getMessage();
             public String exceptionClass = ex.getClass().getSimpleName();
         };
     }
+
 }

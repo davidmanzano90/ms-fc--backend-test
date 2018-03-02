@@ -15,7 +15,7 @@ public class MatcherUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatcherUtils.class);
 
-    private static final Pattern linkPattern = Pattern.compile("(http|https):[^\\s]+(\\s)");
+    private static final Pattern linkPattern = Pattern.compile("(http|https)://[^\\s]+(\\s)");
 
     /**
      * Checks that the text contains links and returns them within a list
