@@ -1,7 +1,10 @@
 package com.scmspain.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scmspain.configuration.TestConfiguration;
+import com.scmspain.entities.Tweet;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +20,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,28 +58,8 @@ public class TweetControllerTest {
         mockMvc.perform(newTweet("Yo", "How are you?"))
                 .andExpect(status().is(201));
 
-        MvcResult getResult = mockMvc.perform(get("/tweet"))
-                .andExpect(status().is(200))
-                .andReturn();
-
-        String content = getResult.getResponse().getContentAsString();
-        assertThat(new ObjectMapper().readValue(content, List.class).size()).isEqualTo(1);
-    }
-
-    @Test
-    public void shouldReturn200WhenDiscardAnInsertedTweet() throws Exception {
-        mockMvc.perform(newTweet("Yo", "How are you?"))
-                .andExpect(status().is(201));
-
-        mockMvc.perform(discardTweet("1"))
-                .andExpect(status().is(200));
-
-        MvcResult getResult = mockMvc.perform(get("/tweet"))
-                .andExpect(status().is(200))
-                .andReturn();
-
-        String content = getResult.getResponse().getContentAsString();
-        assertThat(new ObjectMapper().readValue(content, List.class).size()).isEqualTo(0);
+        List<Tweet> insertedTweets = listTweets();
+        Assert.assertEquals(insertedTweets.size(), 1);
     }
 
     @Test
@@ -93,25 +75,21 @@ public class TweetControllerTest {
     }
 
     @Test
-    public void shouldReturnAllDiscardedTweets() throws Exception {
+    public void shouldDiscardAllTweetsAndReturnInAList() throws Exception {
         mockMvc.perform(newTweet("Yo", "How are you?"))
                 .andExpect(status().is(201));
 
         mockMvc.perform(newTweet("Prospect", "Breaking the law"))
                 .andExpect(status().is(201));
 
-        mockMvc.perform(discardTweet("1"))
-                .andExpect(status().is(200));
+        List<Tweet> insertedTweets = listTweets();
+        for (Tweet tweet : insertedTweets) {
+            mockMvc.perform(discardTweet(tweet.getId().toString()))
+                    .andExpect(status().is(200));
+        }
 
-        mockMvc.perform(discardTweet("2"))
-                .andExpect(status().is(200));
-
-        MvcResult getResult = mockMvc.perform(get("/discarded"))
-                .andExpect(status().is(200))
-                .andReturn();
-
-        String content = getResult.getResponse().getContentAsString();
-        assertThat(new ObjectMapper().readValue(content, List.class).size()).isEqualTo(2);
+        List<Tweet> discardedTweets = listDiscardedTweets();
+        Assert.assertEquals(discardedTweets.size(), insertedTweets.size());
     }
 
     private MockHttpServletRequestBuilder newTweet(String publisher, String tweet) {
@@ -124,6 +102,22 @@ public class TweetControllerTest {
         return post("/discarded")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(format("{\"tweet\": \"%s\"}", tweet));
+    }
+
+    private List<Tweet> listTweets() throws Exception {
+        MvcResult getResult = mockMvc.perform(get("/tweet"))
+                .andExpect(status().is(200)).andReturn();
+        return new ObjectMapper().readValue(
+                getResult.getResponse().getContentAsString(), new TypeReference<List<Tweet>>() {
+                });
+    }
+
+    private List<Tweet> listDiscardedTweets() throws Exception {
+        MvcResult getResult = mockMvc.perform(get("/discarded"))
+                .andExpect(status().is(200)).andReturn();
+        return new ObjectMapper().readValue(
+                getResult.getResponse().getContentAsString(), new TypeReference<List<Tweet>>() {
+                });
     }
 
 }

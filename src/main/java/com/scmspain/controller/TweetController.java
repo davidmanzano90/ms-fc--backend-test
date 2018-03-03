@@ -33,7 +33,7 @@ public class TweetController {
     @PostMapping("/tweet")
     @ResponseStatus(CREATED)
     public void publishTweet(@RequestBody PublishTweetCommand publishTweetCommand) {
-        LOGGER.debug("Publishing tweet with publisher {} and text {}", publishTweetCommand.getPublisher(),
+        LOGGER.debug("Publishing tweet with publisher '{}' and text '{}'", publishTweetCommand.getPublisher(),
                 publishTweetCommand.getTweet());
         this.tweetService.publishTweet(publishTweetCommand.getPublisher(), publishTweetCommand.getTweet());
     }
@@ -47,7 +47,7 @@ public class TweetController {
     @PostMapping("/discarded")
     @ResponseStatus(OK)
     public void discardTweet(@RequestBody DiscardTweetCommand discardTweetCommand) {
-        LOGGER.debug("Discarding tweet with id {}", discardTweetCommand.getTweet());
+        LOGGER.debug("Discarding tweet with id '{}'", discardTweetCommand.getTweet());
         this.tweetService.discardTweet(discardTweetCommand.getTweet());
     }
 

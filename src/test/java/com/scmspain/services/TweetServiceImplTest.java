@@ -40,7 +40,7 @@ public class TweetServiceImplTest {
     }
 
     @Test
-    public void shouldInsertANewTweet() throws Exception {
+    public void shouldPublishTweetInsertANewTweet() throws Exception {
         this.tweetServiceImpl.publishTweet("Guybrush Threepwood", "I am Guybrush Threepwood, mighty pirate.");
         verify(this.tweetRepository).save(any(Tweet.class));
         verify(metricWriter).increment(deltaMetricsCaptor.capture());
@@ -49,7 +49,7 @@ public class TweetServiceImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowAnExceptionWhenValidationFails() {
+    public void shouldPublishTweetThrowAnExceptionWhenValidationFails() {
         doThrow(new IllegalArgumentException()).when(this.tweetValidator).validate(any(Tweet.class));
         this.tweetServiceImpl.publishTweet("Pirate", "LeChuck? He's the guy that went to the Governor's for " +
                 "dinner and never wanted to leave. He fell for her in a big way, but she told him to drop dead. " +
@@ -63,8 +63,16 @@ public class TweetServiceImplTest {
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void shouldThrowAnExceptionWithTweetDoesNotExist() {
+    public void shouldDiscardTweetThrowAnExceptionWhenTweetDoesNotExist() {
         when(this.tweetRepository.findOne(1L)).thenReturn(null);
+        this.tweetServiceImpl.discardTweet(1L);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldDiscardTweetThrowAnExceptionWhenTweetIsDiscarded() {
+        Tweet tweet = new Tweet("publisher", "tweet");
+        tweet.setDiscarded(true);
+        when(this.tweetRepository.findOne(1L)).thenReturn(tweet);
         this.tweetServiceImpl.discardTweet(1L);
     }
 
