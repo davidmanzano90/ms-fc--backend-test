@@ -61,4 +61,16 @@ public class TweetServiceImplTest {
         verify(this.tweetRepository).save(any(Tweet.class));
     }
 
+    @Test
+    public void shouldListAllTweetsOrderedByPublicationDateDesc() {
+        this.tweetServiceImpl.listAllTweets();
+        verify(this.tweetRepository).findAllByDiscardedFalseOrderByPublicationDateDesc();
+    }
+
+    @Test
+    public void shouldListAllDiscardedTweetsOrderedByDiscardedDateDesc() {
+        this.tweetServiceImpl.listAllDiscardedTweets();
+        verify(this.tweetRepository).findAllByDiscardedTrueOrderByDiscardedDateDesc();
+    }
+
 }
