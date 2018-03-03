@@ -20,8 +20,8 @@ public class TweetConfiguration {
     }
 
     @Bean
-    public TweetController getTweetController(TweetServiceImpl tweetServiceImpl) {
-        return new TweetController(tweetServiceImpl);
+    public TweetController getTweetController(TweetService tweetService) {
+        return new TweetController(tweetService);
     }
 
     @Bean

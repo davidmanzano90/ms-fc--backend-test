@@ -31,13 +31,17 @@ public class TweetValidator {
      */
     public void validate(Tweet tweet) {
         if (StringUtils.isEmpty(StringUtils.trimAllWhitespace(tweet.getPublisher()))) {
+            LOGGER.warn("Tweet must have a publisher");
             throw new IllegalArgumentException("Tweet must have a publisher");
         }
         if (StringUtils.isEmpty(StringUtils.trimAllWhitespace(tweet.getTweet()))) {
+            LOGGER.warn("Tweet must not be empty or null");
             throw new IllegalArgumentException("Tweet must not be empty or null");
+
         } else if (tweet.getTweet().length() - countListCharacters(this.matcherUtils.matchLinks(tweet.getTweet()))
                 > TWEET_MAX_CHARACTERS) {
-            throw new IllegalArgumentException("Tweet must not be greater than 140 characters");
+            LOGGER.warn("Tweet must not be greater than {} characters", TWEET_MAX_CHARACTERS);
+            throw new IllegalArgumentException("Tweet must not be greater than " + TWEET_MAX_CHARACTERS + " characters");
         }
     }
 

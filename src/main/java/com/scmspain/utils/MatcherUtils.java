@@ -24,11 +24,14 @@ public class MatcherUtils {
      * @return List<String> - List of the links found in the text
      */
     public List<String> matchLinks(String text) {
+        LOGGER.debug("Matching links in text '{}'", text);
         List<String> links = new ArrayList<>();
         if (!StringUtils.isEmpty(text)) {
             Matcher matcher = linkPattern.matcher(text);
             while (matcher.find()) {
-                links.add(matcher.group());
+                String link = matcher.group();
+                links.add(link);
+                LOGGER.debug("Link '{}' found in text '{}'", link, text);
             }
         }
         return links;

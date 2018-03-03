@@ -19,11 +19,13 @@ public class Tweet {
     private String tweet;
     @Column(nullable = true)
     private Long pre2015MigrationStatus = 0L;
+    @JsonIgnore
     @Column(nullable = false)
     private Date publicationDate;
     @JsonIgnore
     @Column(nullable = false)
     private boolean discarded = false;
+    @JsonIgnore
     @Column
     private Date discardedDate;
 
